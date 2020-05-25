@@ -1,18 +1,12 @@
 package com.ls.test;
 
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.Collections;
+
 /**
- * 图表相关的工具类
- * 主要用于生成对应数据的图表，并将图表转化为对应的图片
+ * 通过Thymeleaf生成
  */
 public class TableUtils {
-
-    /**
-     * 生成柱状图
-     * @return
-     */
-    public static boolean generateHistogram(){
-
-        return false;
-    }
 
 }

@@ -1,0 +1,27 @@
+{
+  color: ['#ff9900'],
+  legend: {
+    data: [
+      {
+        name: '${items[0]}',
+        icon: 'rect',
+      }
+    ],
+  },
+  xAxis: {
+    type: 'category',
+    data: [${xRanges}]
+  },
+  yAxis: {
+    type: 'value',
+    "name": '${unit}'
+  },
+  series: [
+    {
+      name: 'aaa',
+      data: [${datas[0]}],
+      type: 'line',
+      smooth: true
+    }
+  ]
+}
