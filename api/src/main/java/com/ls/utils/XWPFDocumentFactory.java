@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 测试使用
+ * 获取文件流
+ */
 public class XWPFDocumentFactory {
 
     public static XWPFDocument obtainXwpfDocument(){
