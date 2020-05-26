@@ -1,11 +1,17 @@
 {
-  color: ['#ff9900'],
+  <#if colors??>
+  color: [${colors}],
+  </#if>
   legend: {
     data: [
+      <#if items??>
+      <#list items as item>
       {
-        name: '${items[0]}',
+        name: '${item}',
         icon: 'rect',
-      }
+      },
+      </#list>
+      </#if>
     ],
   },
   xAxis: {
@@ -17,11 +23,15 @@
     "name": '${unit}'
   },
   series: [
+    <#if seriesMap??>
+    <#list seriesMap?keys as key>
     {
-      name: '${items[0]}',
-      data: [${datas[0]}],
+      name: '${key}',
+      data: [${seriesMap["${key}"]}],
       type: 'line',
       smooth: true
-    }
+    },
+    </#list>
+    </#if>
   ]
 }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -19,22 +20,14 @@ public class EchartsUtil {
 
     /**
      * 生成柱状图option
-     * 当前模板只支持三组数据对比，不支持3组以上的
      * @param items   对照组名称，String[]
+     *                * @param colors   对照组颜色，String[] 非必填 提供三组不同颜色的对照组
      * @param xRanges   x轴刻度，String[]
      * @param datas   对照组对应数据，int[][]
      * @return
      */
-    public static String generateHistogramOption(String[] items,String[] xRanges,int[][] datas, String unit){
-        String[] resultDate = new String[items.length];
-        for(int i = 0;i<resultDate.length;i++){
-            resultDate[i] = toIntArrayStr(datas[i]);
-        }
-        HashMap<String, Object> resultMap = new HashMap<>();
-        resultMap.put("items", items);
-        resultMap.put("xRanges",  toStringArrayStr(xRanges));
-        resultMap.put("datas", resultDate);
-        resultMap.put("unit", "单位:  "+unit);
+    public static String generateHistogramOption(String[] items,String[] colors,String[] xRanges,int[][] datas, String unit){
+        HashMap<String, Object> resultMap = generateResultMap(items,colors,xRanges,datas,unit);
         String option = null;
         try {
             option = FreemarkerUtil.generateString("histogram.json", "/templates", resultMap);
@@ -50,21 +43,14 @@ public class EchartsUtil {
     /**
      * 生成平滑曲线图option
      * 当前模板只支持单个组的曲线，不支持多组对比
-     * @param items   对照组名称，String[]
-     * @param xRanges   x轴刻度，String[]
-     * @param datas   对照组对应数据，int[][]
+     * @param items   对照组名称，String[] 必填
+     * @param colors   对照组颜色，String[] 非必填 提供三组不同颜色的对照组
+     * @param xRanges   x轴刻度，String[] 必填
+     * @param datas   对照组对应数据，int[][] 必填
      * @return
      */
-    public static String generateSmoothLineOption(String[] items,String[] xRanges,int[][] datas,String unit){
-        String[] resultDate = new String[items.length];
-        for(int i = 0;i<resultDate.length;i++){
-            resultDate[i] = toIntArrayStr(datas[i]);
-        }
-        HashMap<String, Object> resultMap = new HashMap<>();
-        resultMap.put("items", items);
-        resultMap.put("xRanges",  toStringArrayStr(xRanges));
-        resultMap.put("datas", resultDate);
-        resultMap.put("unit", "单位:  "+unit);
+    public static String generateSmoothLineOption(String[] items,String[] colors,String[] xRanges,int[][] datas,String unit){
+        HashMap<String, Object> resultMap = generateResultMap(items,colors,xRanges,datas,unit);
         String option = null;
         try {
             option = FreemarkerUtil.generateString("smooth-line.json", "/templates", resultMap);
@@ -75,6 +61,32 @@ public class EchartsUtil {
         }finally {
             return option;
         }
+    }
+
+    /**
+     * 根据输入信息处理为option可以识别的类型
+     * @param items
+     * @param colors
+     * @param xRanges
+     * @param datas
+     * @param unit
+     * @return
+     */
+    static HashMap<String, Object> generateResultMap(String[] items,String[] colors,String[] xRanges,int[][] datas, String unit){
+        Map<String,String> seriesMap = new HashMap<>();
+        for(int i = 0;i<items.length;i++){
+            seriesMap.put(items[i],toIntArrayStr(datas[i]));
+        }
+        if(colors==null||colors.length<1){
+            colors = new String[]{"#ff9900", "#00cc66", "#1495eb"};
+        }
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("items", items);
+        resultMap.put("colors", toStringArrayStr(colors));
+        resultMap.put("xRanges",  toStringArrayStr(xRanges));
+        resultMap.put("seriesMap", seriesMap);
+        resultMap.put("unit", "单位:  "+unit);
+        return resultMap;
     }
 
     /**

@@ -1,5 +1,8 @@
 {
-  "color": ['#ff9900', '#00cc66', '#1495eb'],
+//  "color": ['#ff9900', '#00cc66', '#1495eb'],
+  <#if colors??>
+  color: [${colors}],
+  </#if>
   "tooltip": {
     "trigger": 'axis',
     "axisPointer": {
@@ -7,7 +10,15 @@
     }
   },
   "legend": {
-    "data": ['${items[0]}', '${items[1]}', '${items[2]}']
+    data: [
+      <#if items??>
+      <#list items as item>
+      {
+        name: '${item}'
+      },
+      </#list>
+      </#if>
+    ]
   },
   "toolbox": {
     "show": false,
@@ -36,8 +47,10 @@
     }
   ],
   "series": [
+    <#if seriesMap??>
+    <#list seriesMap?keys as key>
     {
-      "name": '${items[0]}',
+      "name": '${key}',
       "type": 'bar',
       "barGap": 0,
 //      "label": {
@@ -55,47 +68,9 @@
 //          }
 //        }
 //      },
-      "data": [${datas[0]}]
+      "data": [${seriesMap["${key}"]}],
     },
-    {
-      "name": '${items[1]}',
-      "type": 'bar',
-//      "label": {
-//        "show": true,
-//        "position":'insideBottom',
-//        "distance": 15,
-//        "align": 'left',
-//        "verticalAlign": 'middle',
-//        "formatter": '{c}  {name|{a}}',
-//        "fontSize": 16,
-//        "rotate": 90,
-//        "rich": {
-//          "name": {
-//            "textBorderColor": '#fff'
-//          }
-//        }
-//      },
-      "data": [${datas[1]}]
-    },
-    {
-      "name": '${items[2]}',
-      "type": 'bar',
-//      "label": {
-//        "show": true,
-//        "position":'insideBottom',
-//        "distance": 15,
-//        "align": 'left',
-//        "verticalAlign": 'middle',
-//        "formatter": '{c}  {name|{a}}',
-//        "fontSize": 16,
-//        "rotate": 90,
-//        "rich": {
-//          "name": {
-//            "textBorderColor": '#fff'
-//          }
-//        }
-//      },
-      "data": [${datas[2]}]
-    }
+    </#list>
+    </#if>
   ]
 }
