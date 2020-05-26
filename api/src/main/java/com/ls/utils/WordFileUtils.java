@@ -1,14 +1,13 @@
 package com.ls.utils;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -59,34 +58,7 @@ public class WordFileUtils {
 			Iterator<XWPFParagraph> itPara = document.getParagraphsIterator();
 			while (itPara.hasNext()) {
 				XWPFParagraph paragraph = (XWPFParagraph) itPara.next();
-				Set<String> set = reuleMap.keySet();
-				Iterator<String> iterator = set.iterator();
-				while (iterator.hasNext()) {
-					String key = iterator.next();
-					List<XWPFRun> run = paragraph.getRuns();
-					for (int i = 0; i < run.size(); i++) {
-						if (run.get(i).getText(run.get(i).getTextPosition()) != null &&
-								run.get(i).getText(run.get(i).getTextPosition()).equals(key)) {
-							/**
-							 * 参数0表示生成的文字是要从哪一个地方开始放置,设置文字从位置0开始
-							 * 就可以把原来的文字全部替换掉了
-							 */
-							//处理文字
-							if(isWord(key)){
-								run.get(i).setText(reuleMap.get(key), 0);
-							}
-							//处理图片
-							if(isPicture(key)){
-								//删除原来位置的占位符
-								run.get(i).setText(null, 0);
-								String picturePath = reuleMap.get(key);
-								BufferedImage sourceImg = ImageIO.read(new FileInputStream(picturePath));
-								//根据图片实际长宽比例处理DOC中图片大小
-								run.get(i).addPicture(new FileInputStream(picturePath), XWPFDocument.PICTURE_TYPE_PICT,null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH/sourceImg.getWidth()*sourceImg.getHeight()));
-							}
-						}
-					}
-				}
+				replaceInParagraph(paragraph,reuleMap);
 			}
 
 			/**
@@ -100,11 +72,9 @@ public class WordFileUtils {
 					XWPFTableRow row = table.getRow(i);
 					List<XWPFTableCell> cells = row.getTableCells();
 					for (XWPFTableCell cell : cells) {
-						for (Map.Entry<String, String> e : reuleMap.entrySet()) {
-							if (cell.getText().equals(e.getKey())) {
-								cell.removeParagraph(0);
-								cell.setText(e.getValue());
-							}
+						List<XWPFParagraph> paragraphs= cell.getParagraphs();
+						for(XWPFParagraph paragraph:paragraphs){
+							replaceInParagraph(paragraph,reuleMap);
 						}
 					}
 				}
@@ -116,6 +86,45 @@ public class WordFileUtils {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * 替换段落中的内容
+	 * @param paragraph
+	 * @param reuleMap
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws InvalidFormatException
+	 */
+	static void replaceInParagraph(XWPFParagraph paragraph,Map<String,String> reuleMap) throws FileNotFoundException, IOException, InvalidFormatException {
+		Set<String> set = reuleMap.keySet();
+		Iterator<String> iterator = set.iterator();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+			List<XWPFRun> run = paragraph.getRuns();
+			for (int i = 0; i < run.size(); i++) {
+				if (run.get(i).getText(run.get(i).getTextPosition()) != null &&
+						run.get(i).getText(run.get(i).getTextPosition()).equals(key)) {
+					/**
+					 * 参数0表示生成的文字是要从哪一个地方开始放置,设置文字从位置0开始
+					 * 就可以把原来的文字全部替换掉了
+					 */
+					//处理文字
+					if(isWord(key)){
+						run.get(i).setText(reuleMap.get(key), 0);
+					}
+					//处理图片
+					if(isPicture(key)){
+						//删除原来位置的占位符
+						run.get(i).setText(null, 0);
+						String picturePath = reuleMap.get(key);
+						BufferedImage sourceImg = ImageIO.read(new FileInputStream(picturePath));
+						//根据图片实际长宽比例处理DOC中图片大小
+						run.get(i).addPicture(new FileInputStream(picturePath), XWPFDocument.PICTURE_TYPE_PICT,null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH/sourceImg.getWidth()*sourceImg.getHeight()));
+					}
+				}
+			}
+		}
 	}
 
 	/**
