@@ -2,6 +2,7 @@ package com.ls.entity.echarts;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,5 +20,5 @@ public class Option {
     /**
      * 对照组信息
      */
-    List<SeriesItem> seriesItemList;
+    ArrayList<SeriesItem> seriesItemList;
 }

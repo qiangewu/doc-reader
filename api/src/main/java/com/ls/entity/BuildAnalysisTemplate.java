@@ -1,6 +1,9 @@
 package com.ls.entity;
 
+import com.ls.entity.echarts.Option;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 对应楼宇潜力客户用能初步分析报告模板
@@ -43,7 +46,8 @@ public class BuildAnalysisTemplate {
     String serveTelNum;
 
     /**
-     * 峰谷平电量（按月）趋势图地址
+     * 峰谷平电量（按月）趋势图路径
+     * 自动生成，不需要填写
      */
     String electricityTrend;
 
@@ -95,7 +99,8 @@ public class BuildAnalysisTemplate {
     String electricityTrendAnalysis;
 
     /**
-     * 月均负荷曲线图地址
+     * 月均负荷曲线图路径
+     * 自动生成，不需要填写
      */
     String loadLine;
 
@@ -135,6 +140,7 @@ public class BuildAnalysisTemplate {
 
     /**
      * 总体功率因数趋势图路径
+     * 自动生成，不需要填写
      */
     String powerFactorTrend;
 
@@ -170,6 +176,7 @@ public class BuildAnalysisTemplate {
 
     /**
      * 用能情况表路径
+     * 自动生成，不需要填写
      */
     String powerUsage;
 
@@ -192,5 +199,26 @@ public class BuildAnalysisTemplate {
      * 变压器负载诊断
      */
     String powerFactorDiagnosis;
+
+    /**
+     * echarts 柱状图 峰谷平电量（按月）趋势
+     */
+    Option electricityTrendOption;
+
+    /**
+     * echarts 平滑曲线图 月均负荷曲线
+     */
+    Option loadLineOption;
+
+    /**
+     * echarts 平滑曲线图 总体功率因数趋势
+     */
+    Option powerFactorTrendOption;
+
+    /**
+     * html table图表 主要用能情况数据
+     */
+    List<EnergyUsage> energyUsageList;
+
 
 }

@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
+/**
+ * echarts图表图片生成
+ */
 public class EchartsUtil {
 
     private static final String EC_PATH = "C:\\programes\\git\\doc-reader\\api\\src\\main\\resources\\static\\js\\echarts-convert.js";
     private static final String PHANTOM_PATH = "C:\\software\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe";
-    private static final String TEMP_PATH = "C:\\Users\\zhangyang\\Desktop\\temp\\";
+    private static final String TEMP_PATH = "C:\\Users\\zhangyang\\Desktop\\temp\\test\\";
 
     static Logger logger = LoggerFactory.getLogger(EchartsUtil.class);
 
@@ -26,20 +28,21 @@ public class EchartsUtil {
      * 生成option对应图表
      * @param option
      * @param echartsType  需要生成的模版类型（待拓展）
+     * @return 图片路径
      */
-    public static void generateEchartsPicture(Option option, EchartsType echartsType){
+    public static String generateEchartsPicture(Option option, EchartsType echartsType){
         String optionJson = null;
         if(echartsType.equals(EchartsType.HISTOGRAM)){
             optionJson = generateHistogramOption(option);
         }
         if(echartsType.equals(EchartsType.SMOOTH_LINE)){
-            optionJson = generateHistogramOption(option);
+            optionJson = generateSmoothLineOption(option);
         }
         if(StringUtil.isBlank((optionJson))){
             logger.error("图表生成失败，请检查相应参数");
-            return;
+            return null;
         }
-        toEChartsPicture(optionJson);
+        return toEChartsPicture(optionJson);
     }
 
     /**
@@ -49,20 +52,21 @@ public class EchartsUtil {
      * @param xRanges   x轴刻度，String[] 必填
      * @param datas   对照组对应数据，int[][] 必填
      * @param echartsType  需要生成的模版类型（待拓展）
+     * @return 图片路径
      */
-    public static void generateEchartsPicture(String[] items,String[] colors,String[] xRanges,int[][] datas, String unit, EchartsType echartsType){
+    public static String generateEchartsPicture(String[] items,String[] colors,String[] xRanges,double[][] datas, String unit, EchartsType echartsType){
         String optionJson = null;
         if(echartsType.equals(EchartsType.HISTOGRAM)){
             optionJson = generateHistogramOption(items,colors,xRanges,datas,unit);
         }
         if(echartsType.equals(EchartsType.SMOOTH_LINE)){
-            optionJson = generateHistogramOption(items,colors,xRanges,datas,unit);
+            optionJson = generateSmoothLineOption(items,colors,xRanges,datas,unit);
         }
         if(StringUtil.isBlank((optionJson))){
             logger.error("图表生成失败，请检查相应参数");
-            return;
+            return null;
         }
-        toEChartsPicture(optionJson);
+        return toEChartsPicture(optionJson);
     }
 
     /**
@@ -73,7 +77,7 @@ public class EchartsUtil {
      * @param datas   对照组对应数据，int[][]
      * @return
      */
-    public static String generateHistogramOption(String[] items,String[] colors,String[] xRanges,int[][] datas, String unit){
+    static String generateHistogramOption(String[] items,String[] colors,String[] xRanges,double[][] datas, String unit){
         HashMap<String, Object> resultMap = generateResultMap(items,colors,xRanges,datas,unit);
         String option = null;
         try {
@@ -117,7 +121,7 @@ public class EchartsUtil {
      * @param datas   对照组对应数据，int[][] 必填
      * @return
      */
-    static String generateSmoothLineOption(String[] items,String[] colors,String[] xRanges,int[][] datas,String unit){
+    static String generateSmoothLineOption(String[] items,String[] colors,String[] xRanges,double[][] datas,String unit){
         HashMap<String, Object> resultMap = generateResultMap(items,colors,xRanges,datas,unit);
         String option = null;
         try {
@@ -160,10 +164,10 @@ public class EchartsUtil {
      * @param unit
      * @return
      */
-    static HashMap<String, Object> generateResultMap(String[] items,String[] colors,String[] xRanges,int[][] datas, String unit){
+    static HashMap<String, Object> generateResultMap(String[] items,String[] colors,String[] xRanges,double[][] datas, String unit){
         Map<String,String> seriesMap = new HashMap<>();
         for(int i = 0;i<items.length;i++){
-            seriesMap.put(items[i],toIntArrayStr(datas[i]));
+            seriesMap.put(items[i],toDoubleArrayStr(datas[i]));
         }
         if(colors==null||colors.length<1){
             colors = new String[]{"#ff9900", "#00cc66", "#1495eb"};
@@ -184,22 +188,42 @@ public class EchartsUtil {
      */
     static HashMap<String, Object> generateResultMap(Option option){
         Map<String,String> seriesMap = new HashMap<>();
-        List<SeriesItem> items = option.getSeriesItemList();
-        String[] colors = new String[items.size()];
-        for(int i=0;i<items.size();i++){
-            seriesMap.put(items.get(i).getItemName(),toIntArrayStr(items.get(i).getData()));
-            colors[i] = items.get(i).getColor();
+        List<SeriesItem> seriesItems = option.getSeriesItemList();
+        String[] colors = new String[seriesItems.size()];
+        String[] titles = new String[seriesItems.size()];
+        for(int i=0;i<seriesItems.size();i++){
+            seriesMap.put(seriesItems.get(i).getItemName(),toDoubleArrayStr(seriesItems.get(i).getData()));
+            titles[i] = seriesItems.get(i).getItemName();
+            colors[i] = seriesItems.get(i).getColor();
         }
-        if(colors==null||colors.length<1){
+        if(!isLegalColors(colors)){
             colors = new String[]{"#ff9900", "#00cc66", "#1495eb"};
         }
         HashMap<String, Object> resultMap = new HashMap<>();
-        resultMap.put("items", items);
+        resultMap.put("items", titles);
         resultMap.put("colors", toStringArrayStr(colors));
         resultMap.put("xRanges",  toStringArrayStr(option.getXRange()));
         resultMap.put("seriesMap", seriesMap);
         resultMap.put("unit", "单位:  "+option.getUnit());
         return resultMap;
+    }
+
+    /**
+     * 是否是echarts可以识别的颜色
+     * false表示不合法
+     * @param colors
+     * @return
+     */
+    static boolean isLegalColors(String[] colors){
+        if(colors==null||colors.length<1){
+            return false;
+        }
+        for(String color:colors){
+            if(StringUtil.isBlank(color)||!color.startsWith("#")){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -221,12 +245,12 @@ public class EchartsUtil {
      * 将int型数组转化为','分割的字符串
      * @return
      */
-    static String toIntArrayStr(int[] array){
+    static String toDoubleArrayStr(double[] array){
         if(array==null||array.length<1){
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for(int str:array){
+        for(double str:array){
             sb.append(str+",");
         }
         return sb.substring(0,sb.length()-1);
@@ -256,7 +280,7 @@ public class EchartsUtil {
                 logger.info(line);
             }
             input.close();
-
+            process.destroy();
         } catch (IOException e) {
             e.printStackTrace();
         }finally{
