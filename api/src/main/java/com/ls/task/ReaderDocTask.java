@@ -1,6 +1,8 @@
 package com.ls.task;
 
-import com.ls.utils.WordFileUtils;
+import com.ls.entity.BuildAnalysisTemplate;
+import com.ls.handlers.BuildTemplateWordHandler;
+import com.ls.utils.WordFileUtil;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.stereotype.Component;
@@ -33,10 +35,12 @@ public class ReaderDocTask {
             FileInputStream fis = new FileInputStream("C:\\Users\\zhangyang\\Desktop\\temp\\doc-analysis\\template.docx");
             FileOutputStream fos = new FileOutputStream("C:\\Users\\zhangyang\\Desktop\\temp\\doc-analysis\\target.docx");
             ZipSecureFile.setMinInflateRatio(-1.0d);
-            Map<String,String> params = new HashMap<>();
-            params.put("${test}","你好");
-            params.put("$P{electricityTrend}",PICTURE_PATH+ File.separator+"3.png");
-            WordFileUtils.replaceDocx(fis,fos,params);
+            //模拟数据，实际场景需要替换此处
+            BuildAnalysisTemplate buildAnalysisTemplate = BuildTemplateWordHandler.inintBuildAnalysisTemplate();
+
+            //转化Word识别的Map
+            HashMap<String,String> resultTable = BuildTemplateWordHandler.templateToTable(buildAnalysisTemplate);
+            WordFileUtil.replaceDocx(fis,fos,resultTable);
             fis.close();
             fos.close();
         } catch (Exception e) {

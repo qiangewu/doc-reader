@@ -23,10 +23,10 @@ import javax.imageio.ImageIO;
 /**
  * word文档处理的相应工具类
  */
-public class WordFileUtils {
+public class WordFileUtil {
 
 
-	private static Logger logger = LoggerFactory.getLogger(WordFileUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(WordFileUtil.class);
 
 	final static String WORD_PREFIX = "${";
 
@@ -141,7 +141,7 @@ public class WordFileUtils {
 	/**
 	 * 判断替换key类型是文字
 	 */
-	public static boolean isWord(String key){
+	private static boolean isWord(String key){
 		if(key.startsWith(WORD_PREFIX)&&key.endsWith(SUFFIX)){
 			return true;
 		}
@@ -152,7 +152,7 @@ public class WordFileUtils {
 	/**
 	 * 判断替换key类型是图片
 	 */
-	public static boolean isPicture(String key){
+	private static boolean isPicture(String key){
 		if(key.startsWith(PICTURE_PREFIX)&&key.endsWith(SUFFIX)){
 			return true;
 		}

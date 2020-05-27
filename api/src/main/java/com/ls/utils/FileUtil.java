@@ -4,7 +4,7 @@ package com.ls.utils;
 import com.ls.enums.FileType;
 import org.springframework.util.StringUtils;
 
-public class FileUtils {
+public class FileUtil {
 
     /**
      * 判断是否是word文档

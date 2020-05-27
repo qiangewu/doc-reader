@@ -1,5 +1,6 @@
 package com.ls.handlers;
 
+import com.ls.enums.EchartsType;
 import com.ls.enums.UnitType;
 import com.ls.utils.EchartsUtil;
 import org.slf4j.Logger;
@@ -21,8 +22,7 @@ public class EchartGenerator {
         int[][] datas = new int[][]{{10000000,2,3,4,5},{10000000,2,3,20000000,5},{10000000,2,3,4,40000000}};
         String unit = UnitType.KWH.getDesc();
         //生成柱状图所需的option
-        String option = EchartsUtil.generateHistogramOption(items,new String[]{},xRanges,datas,unit);
-        EchartsUtil.generateEChart(option);
+         EchartsUtil.generateEchartsPicture(items,new String[]{},xRanges,datas,unit, EchartsType.HISTOGRAM);
 
 //        String[] items = new String[] {"有功功率|晶体 三厂","test"};
 //        String[] xRanges = new String[] {"6月1日", "4日", "7日", "10日", "13日", "16日", "19日", "22日", "25日", "28日", "30日"};
