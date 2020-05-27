@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class FreemarkerUtil {
 
-    private static final String path = FreemarkerUtil.class.getClassLoader().getResource("").getPath();
+    private static final String RESOURCES_PATH = FreemarkerUtil.class.getClassLoader().getResource("").getPath();
 
     /**
      * 将datas信息写入模板并返回
@@ -30,7 +30,7 @@ public class FreemarkerUtil {
         configuration.setDefaultEncoding("UTF-8");
 
         // 设置模板所在文件夹
-        configuration.setDirectoryForTemplateLoading(new File(path + templateDirectory));
+        configuration.setDirectoryForTemplateLoading(new File(RESOURCES_PATH + templateDirectory));
 
         // 生成模板对象
         Template template = configuration.getTemplate(templateFileName);

@@ -5,9 +5,9 @@ import com.ls.entity.echarts.Option;
 import com.ls.enums.EchartsType;
 import com.ls.enums.UnitType;
 import com.ls.utils.EchartsUtil;
-import com.ls.utils.HtmlTableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -56,6 +56,10 @@ public class EchartGenerator {
             path = EchartsUtil.generateEchartsPicture(powerFactorTrendOption, EchartsType.SMOOTH_LINE);
         }
         return path;
+    }
+
+    public static void main(String[] args) {
+        generateLoadLineOption(SimulateDateHandler.initLoadLineOption());
     }
 
 

@@ -3,6 +3,7 @@ package com.ls.utils;
 import com.ls.entity.echarts.Option;
 import com.ls.entity.echarts.SeriesItem;
 import com.ls.enums.EchartsType;
+import com.ls.enums.SystemEnv;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,10 @@ import java.util.UUID;
  */
 public class EchartsUtil {
 
-    private static final String EC_PATH = "C:\\programes\\git\\doc-reader\\api\\src\\main\\resources\\static\\js\\echarts-convert.js";
-    private static final String PHANTOM_PATH = "C:\\software\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe";
-    private static final String TEMP_PATH = "C:\\Users\\zhangyang\\Desktop\\temp\\test\\";
+    private static final String ECHARTS_CONVERT_PATH = EchartsUtil.class.getClassLoader().getResource("").getPath() + "static/js/echarts-convert.js";
+    private static final String SYSTEM_ENV = PropertiesUtil.readProperties().getSystemEnv();
+    private static final String PHANTOMJS_PATH =PropertiesUtil.readProperties().getPhantomjsPath();
+    private static final String TEMP_DIR =PropertiesUtil.readProperties().getTempPath();
 
     static Logger logger = LoggerFactory.getLogger(EchartsUtil.class);
 
@@ -263,8 +265,8 @@ public class EchartsUtil {
      */
     static String toEChartsPicture(String option) {
         String dataPath = writeFile(option);
-        String fileName= "test-"+ UUID.randomUUID().toString().substring(0, 8) + ".png";
-        String path = TEMP_PATH +fileName;
+        String fileName= "echarts-"+ UUID.randomUUID().toString().substring(0, 8) + ".png";
+        String path = TEMP_DIR+ File.separator +fileName;
         try {
             File file = new File(path);     //文件路径（路径+文件名）
             if (!file.exists()) {   //文件不存在则创建文件，先创建目录
@@ -272,7 +274,12 @@ public class EchartsUtil {
                 dir.mkdirs();
                 file.createNewFile();
             }
-            String cmd = PHANTOM_PATH + " " + EC_PATH + " -infile " + dataPath + " -outfile " + path;
+            //处理不同系统环境下echartsConvertJs路径及cmd命令
+            String echartsConvertPath = ECHARTS_CONVERT_PATH;
+            if(SystemEnv.WINDOWS.getType().equals(SYSTEM_ENV)){
+                echartsConvertPath = echartsConvertPath.substring(1);
+            }
+            String cmd = PHANTOMJS_PATH + " " + echartsConvertPath + " -infile " + dataPath + " -outfile " + path;
             Process process = Runtime.getRuntime().exec(cmd);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
@@ -295,7 +302,7 @@ public class EchartsUtil {
      * @return
      */
     public static String writeFile(String options) {
-        String dataPath= TEMP_PATH + UUID.randomUUID().toString().substring(0, 8) +".json";
+        String dataPath= TEMP_DIR+ File.separator + UUID.randomUUID().toString().substring(0, 8) +".json";
         try {
             /* 写入Txt文件 */
             File writename = new File(dataPath); // 相对路径，如果没有则要建立一个新的output.txt文件

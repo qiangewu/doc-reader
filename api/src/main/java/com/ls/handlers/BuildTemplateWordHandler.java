@@ -1,13 +1,12 @@
 package com.ls.handlers;
 
+import com.ls.config.GlobalConfig;
 import com.ls.entity.BuildAnalysisTemplate;
 import com.ls.entity.EnergyUsage;
 import com.ls.entity.echarts.Option;
 import com.ls.entity.echarts.SeriesItem;
 import com.ls.enums.*;
-import com.ls.utils.EchartsUtil;
-import com.ls.utils.HtmlTableUtil;
-import com.ls.utils.WordFileUtil;
+import com.ls.utils.*;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.stereotype.Component;
@@ -25,8 +24,29 @@ import java.util.Map;
  * 对应楼宇潜力客户用能初步分析报告模板
  * 数据转化、数据模拟等处理
  */
-@Component
 public class BuildTemplateWordHandler {
+
+
+    public static void generateNewWord(BuildAnalysisTemplate buildAnalysisTemplate){
+        GlobalConfig globalConfig = PropertiesUtil.readProperties();
+        XWPFDocument xwpfDocument = null;
+        try {
+            FileInputStream fis = new FileInputStream(globalConfig.getTemplateDir());
+            FileOutputStream fos = new FileOutputStream(globalConfig.getTemplateResultDir());
+            ZipSecureFile.setMinInflateRatio(-1.0d);
+            //生成对应图片
+            BuildTemplateWordHandler.generatePicture(buildAnalysisTemplate);
+            //转化Word识别的Map
+            HashMap<String,String> resultTable = BuildTemplateWordHandler.templateToTable(buildAnalysisTemplate);
+            WordFileUtil.replaceDocx(fis,fos,resultTable);
+            fis.close();
+            fos.close();
+            //清空临时文件
+//            FileUtil.deleteAllSafely(globalConfig.getTempPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 将BuildAnalysisTemplate 转为Word识别的Map信息
