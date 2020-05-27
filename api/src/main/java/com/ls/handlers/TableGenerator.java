@@ -22,9 +22,12 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.*;
 
-public class TableHandler {
+/**
+ * 生成对应table图片
+ */
+public class TableGenerator {
 
-    static Logger logger = LoggerFactory.getLogger(TableHandler.class);
+    static Logger logger = LoggerFactory.getLogger(TableGenerator.class);
 
 
     public static void main(String[] args) {

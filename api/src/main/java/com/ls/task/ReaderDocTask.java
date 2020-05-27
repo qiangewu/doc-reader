@@ -17,7 +17,7 @@ import java.util.Map;
  * 定时读取某路径下的doc文件模板并解析
  * 生成对应的doc文件
  */
-@Component
+//@Component
 public class ReaderDocTask {
 
     final static String PICTURE_PATH = "C:\\Users\\zhangyang\\Desktop\\temp";

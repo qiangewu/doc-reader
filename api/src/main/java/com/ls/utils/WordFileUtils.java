@@ -17,7 +17,6 @@ import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import javax.imageio.ImageIO;
 
@@ -27,7 +26,7 @@ import javax.imageio.ImageIO;
 public class WordFileUtils {
 
 
-	private Logger logger = LoggerFactory.getLogger(WordFileUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(WordFileUtils.class);
 
 	final static String WORD_PREFIX = "${";
 
@@ -111,16 +110,28 @@ public class WordFileUtils {
 					 */
 					//处理文字
 					if(isWord(key)){
-						run.get(i).setText(reuleMap.get(key), 0);
+						if(!StringUtil.isBlank(reuleMap.get(key))) {
+							run.get(i).setText(reuleMap.get(key), 0);
+						}else{
+							run.get(i).setText("", 0);
+						}
 					}
 					//处理图片
 					if(isPicture(key)){
 						//删除原来位置的占位符
 						run.get(i).setText(null, 0);
 						String picturePath = reuleMap.get(key);
-						BufferedImage sourceImg = ImageIO.read(new FileInputStream(picturePath));
-						//根据图片实际长宽比例处理DOC中图片大小
-						run.get(i).addPicture(new FileInputStream(picturePath), XWPFDocument.PICTURE_TYPE_PICT,null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH/sourceImg.getWidth()*sourceImg.getHeight()));
+						if(!StringUtil.isBlank(picturePath)) {
+							BufferedImage sourceImg = null;
+							try {
+								sourceImg = ImageIO.read(new FileInputStream(picturePath));
+							} catch (IOException e) {
+								logger.error(e.toString());
+								logger.error("图表图片读取失败,请检查路径： {}", picturePath);
+							}
+							//根据图片实际长宽比例处理DOC中图片大小
+							run.get(i).addPicture(new FileInputStream(picturePath), XWPFDocument.PICTURE_TYPE_PICT, null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH / sourceImg.getWidth() * sourceImg.getHeight()));
+						}
 					}
 				}
 			}
