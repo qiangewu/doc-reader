@@ -124,12 +124,22 @@ public class WordFileUtil {
 						if(!StringUtil.isBlank(picturePath)) {
 							BufferedImage sourceImg = null;
 							try {
-								sourceImg = ImageIO.read(new FileInputStream(picturePath));
+								FileInputStream fis = new FileInputStream(picturePath);
+								//ImageIOD读完实际已经关闭了fis,需要重新读取
+								sourceImg = ImageIO.read(fis);
+								double width = sourceImg.getWidth();
+								double height = sourceImg.getHeight();
+								fis.close();
+								FileInputStream picFis = new FileInputStream(picturePath);
 								//根据图片实际长宽比例处理DOC中图片大小
-								run.get(i).addPicture(new FileInputStream(picturePath), XWPFDocument.PICTURE_TYPE_PICT, null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH / sourceImg.getWidth() * sourceImg.getHeight()));
+								run.get(i).addPicture(picFis, XWPFDocument.PICTURE_TYPE_PICT, null, Units.toEMU(DOC_WIDTH), Units.toEMU(DOC_WIDTH / width * height));
+								Thread.sleep(500l);
+								picFis.close();
 							} catch (IOException e) {
 								logger.error(e.toString());
 								logger.error("图表图片读取失败,请检查路径： {}", picturePath);
+							} catch (InterruptedException e){
+
 							}
 						}
 					}

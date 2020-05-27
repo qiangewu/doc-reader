@@ -48,7 +48,7 @@ public class ReaderDocTask {
             fis.close();
             fos.close();
             //清空临时文件
-//            FileUtil.deleteAllSafely(PICTURE_PATH);
+            FileUtil.deleteAllSafely(PICTURE_PATH);
         } catch (Exception e) {
             e.printStackTrace();
         }
